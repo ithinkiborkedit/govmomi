@@ -1,4 +1,4 @@
-module github.com/vmware/govmomi
+module github.com/ithinkiborkedit/govmomi
 
 go 1.22
 
