@@ -20,6 +20,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -58,6 +59,57 @@ func (ds *Datastore) model(m *Model) error {
 		info.Url = dir
 	}
 	return nil
+}
+
+func (ds *Datastore) SearchDatastoreTask(ctx *Context, req *types.SearchDatastore_Task) soap.HasFault {
+	task := CreateTask(ds, "searchDatastore", func(*Task) (types.AnyType, types.BaseMethodFault) {
+		searchSpec := req.SearchSpec
+		results := &types.HostDatastoreBrowserSearchResults{
+			Datastore:  &ds.Self,
+			FolderPath: req.DatastorePath,
+		}
+
+		// Simulate file search
+		basePath := ds.Info.GetDatastoreInfo().Url
+		searchPath := filepath.Join(basePath, req.DatastorePath)
+		err := filepath.Walk(searchPath, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			// Match files based on the search spec
+			if matchFile(info, searchSpec) {
+				fileInfo := types.FileInfo{
+					Path:         strings.TrimPrefix(path, basePath),
+					FileSize:     info.Size(),
+					Modification: types.NewTime(info.ModTime()),
+				}
+				results.File = append(results.File, &fileInfo)
+			}
+			return nil
+		})
+
+		if err != nil {
+			return nil, &types.InvalidDatastorePath{DatastorePath: req.DatastorePath}
+		}
+
+		return results, nil
+	})
+
+	return &methods.SearchDatastore_TaskBody{
+		Res: &types.SearchDatastore_TaskResponse{
+			Returnval: task.Run(ctx),
+		},
+	}
+}
+
+func matchFile(info os.FileInfo, spec *types.HostDatastoreBrowserSearchSpec) bool {
+	for _, pattern := range spec.MatchPattern {
+		if matched, _ := filepath.Match(pattern, info.Name()); matched {
+			return true
+		}
+	}
+	return false
 }
 
 func parseDatastorePath(dsPath string) (*object.DatastorePath, types.BaseMethodFault) {
