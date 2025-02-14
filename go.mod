@@ -1,4 +1,4 @@
-module github.com/vmware/govmomi
+module github.com/vmware/govmomiv2
 
 go 1.21 // required for slices/maps package and built-in clear function
 
