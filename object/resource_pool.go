@@ -44,8 +44,12 @@ func (p ResourcePool) Owner(ctx context.Context) (Reference, error) {
 	if err != nil {
 		return nil, err
 	}
+	ref, err := NewReference(p.Client(), pool.Owner)
+	if err != nil {
+		return nil, err
+	}
 
-	return NewReference(p.Client(), pool.Owner), nil
+	return ref, nil
 }
 
 func (p ResourcePool) ImportVApp(ctx context.Context, spec types.BaseImportSpec, folder *Folder, host *HostSystem) (*nfc.Lease, error) {

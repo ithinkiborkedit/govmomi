@@ -334,7 +334,10 @@ func (f *Finder) ObjectReference(ctx context.Context, ref types.ManagedObjectRef
 		return nil, err
 	}
 
-	r := object.NewReference(f.client, ref)
+	r, err := object.NewReference(f.client, ref)
+	if err != nil {
+		return nil, err
+	}
 
 	type common interface {
 		SetInventoryPath(string)
@@ -860,8 +863,20 @@ func (f *Finder) networkByID(ctx context.Context, path string) (object.NetworkRe
 	if len(refs) > 1 {
 		return nil, &MultipleFoundError{"network", path}
 	}
+	refobj, err := object.NewReference(f.client, refs[0])
+	if err != nil {
+		return nil, err
+	}
+	netref, ok := refobj.(object.NetworkReference)
+	if !ok {
+		return nil, err
+	}
+	// obj, err, _ := object.NewReference(f.client, refs[0]).(object.NetworkReference)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	return object.NewReference(f.client, refs[0]).(object.NetworkReference), nil
+	return netref, nil
 }
 
 func (f *Finder) DefaultNetwork(ctx context.Context) (object.NetworkReference, error) {

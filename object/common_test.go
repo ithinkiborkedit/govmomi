@@ -52,7 +52,11 @@ func TestObjectName(t *testing.T) {
 
 		for _, kind := range kinds {
 			ref := simulator.Map.Any(kind)
-			obj := object.NewReference(c, ref.Reference())
+			nw, err := object.NewReference(c, ref.Reference())
+			if err != nil {
+				return
+			}
+			obj := nw
 
 			name, err := obj.(common).ObjectName(ctx)
 			if err != nil {
