@@ -51,7 +51,11 @@ func (f Folder) Children(ctx context.Context) ([]Reference, error) {
 
 	var rs []Reference
 	for _, e := range mf.ChildEntity {
-		if r := NewReference(f.c, e); r != nil {
+		fold, err := NewReference(f.c, e)
+		if err != nil {
+			return nil, err
+		}
+		if r := fold; r != nil {
 			rs = append(rs, r)
 		}
 	}

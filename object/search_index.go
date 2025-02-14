@@ -52,7 +52,11 @@ func (s SearchIndex) FindByDatastorePath(ctx context.Context, dc *Datacenter, pa
 	if res.Returnval == nil {
 		return nil, nil
 	}
-	return NewReference(s.c, *res.Returnval), nil
+	ref, err := NewReference(s.c, *res.Returnval)
+	if err != nil {
+		return nil, err
+	}
+	return ref, nil
 }
 
 // FindByDnsName finds a virtual machine or host by DNS name.
@@ -75,7 +79,11 @@ func (s SearchIndex) FindByDnsName(ctx context.Context, dc *Datacenter, dnsName 
 	if res.Returnval == nil {
 		return nil, nil
 	}
-	return NewReference(s.c, *res.Returnval), nil
+	ref, err := NewReference(s.c, *res.Returnval)
+	if err != nil {
+		return nil, err
+	}
+	return ref, nil
 }
 
 // FindByInventoryPath finds a managed entity based on its location in the inventory.
@@ -94,7 +102,10 @@ func (s SearchIndex) FindByInventoryPath(ctx context.Context, path string) (Refe
 		return nil, nil
 	}
 
-	r := NewReference(s.c, *res.Returnval)
+	r, err := NewReference(s.c, *res.Returnval)
+	if err != nil {
+		return nil, err
+	}
 
 	type common interface {
 		SetInventoryPath(string)
@@ -127,7 +138,11 @@ func (s SearchIndex) FindByIp(ctx context.Context, dc *Datacenter, ip string, vm
 	if res.Returnval == nil {
 		return nil, nil
 	}
-	return NewReference(s.c, *res.Returnval), nil
+	ref, err := NewReference(s.c, *res.Returnval)
+	if err != nil {
+		return nil, err
+	}
+	return ref, nil
 }
 
 // FindByUuid finds a virtual machine or host by UUID.
@@ -151,7 +166,11 @@ func (s SearchIndex) FindByUuid(ctx context.Context, dc *Datacenter, uuid string
 	if res.Returnval == nil {
 		return nil, nil
 	}
-	return NewReference(s.c, *res.Returnval), nil
+	ref, err := NewReference(s.c, *res.Returnval)
+	if err != nil {
+		return nil, err
+	}
+	return ref, nil
 }
 
 // FindChild finds a particular child based on a managed entity name.
@@ -170,7 +189,11 @@ func (s SearchIndex) FindChild(ctx context.Context, entity Reference, name strin
 	if res.Returnval == nil {
 		return nil, nil
 	}
-	return NewReference(s.c, *res.Returnval), nil
+	ref, err := NewReference(s.c, *res.Returnval)
+	if err != nil {
+		return nil, err
+	}
+	return ref, nil
 }
 
 // FindAllByDnsName finds all virtual machines or hosts by DNS name.
@@ -196,7 +219,11 @@ func (s SearchIndex) FindAllByDnsName(ctx context.Context, dc *Datacenter, dnsNa
 
 	var references []Reference
 	for _, returnval := range res.Returnval {
-		references = append(references, NewReference(s.c, returnval))
+		r, err := NewReference(s.c, returnval)
+		if err != nil {
+			return nil, err
+		}
+		references = append(references, r)
 	}
 	return references, nil
 }
@@ -224,7 +251,11 @@ func (s SearchIndex) FindAllByIp(ctx context.Context, dc *Datacenter, ip string,
 
 	var references []Reference
 	for _, returnval := range res.Returnval {
-		references = append(references, NewReference(s.c, returnval))
+		r, err := NewReference(s.c, returnval)
+		if err != nil {
+			return nil, err
+		}
+		references = append(references, r)
 	}
 	return references, nil
 }
@@ -253,7 +284,11 @@ func (s SearchIndex) FindAllByUuid(ctx context.Context, dc *Datacenter, uuid str
 
 	var references []Reference
 	for _, returnval := range res.Returnval {
-		references = append(references, NewReference(s.c, returnval))
+		r, err := NewReference(s.c, returnval)
+		if err != nil {
+			return nil, err
+		}
+		references = append(references, r)
 	}
 	return references, nil
 }
